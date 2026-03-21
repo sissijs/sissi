@@ -80,26 +80,26 @@ function parseList(block) {
   return renderList(list);
 }
 
-function codeblocks(str, snippetStore) {
-  let counter = 1;
-  return str.split(/\n```/g).map((part, idx) => {
+function codeblocks(str) {
+  const parts = [];
+  str.split(/\n```/g).forEach((part, idx) => {
     if (idx % 2 === 0) {
-      return part;
+      parts.push({type: 'text', content: part});
+      return;
     }
     const lf = part.indexOf('\n');
     if (lf === -1) {
-      return part;
+      parts[parts.length - 1].content += '\n```' + part;
+      return;
     }
     const lang = part.slice(0, lf);
     const code = part.slice(lf + 1);
-    const key =  'MARKDOWNSNIPPET' + (counter++)
     const l = lang ? ` class="language-${lang}"` : '';
-    snippetStore.set(key,
+    parts.push({type: 'snippet', html:
       `<pre${l}><code${l}>${code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}\n</code></pre>`
-    );
-    
-    return `{{ ${key} }}`
-  }).join('\n').trim();
+    });
+  });
+  return parts;
 }
 
 export function markdownEscape(str) {
@@ -113,29 +113,22 @@ export function markdown(input, escape = true) {
   if (! input) {
     return undefined;
   }
-  const vars = new Map();
-  const esc = (str) => escape?markdownEscape(str):str;
-  return esc(codeblocks(input.replace(/\r\n/g,'\n'), vars).split('\n\n')
-    .map(block => {
-    block = block.trim();
-    if (/\{\{ MARKDOWNSNIPPET\d+ \}\}/.test(block)) {
-      return block;
-    }
-    if (/^<.+?>/.test(block)) {
-      return block;
-    }
-    const hm = block.match(/^(#{1,6}) (.+)$/);
-    if (hm) {
-      return `<h${hm[1].length}>${inlines(hm[2])}</h${hm[1].length}>`;
-    }
-    if (UL_PATTERN.test(block)) {
-      return parseList(block);
-    }
-    if (block.startsWith('> ')) {
-      return `<blockquote>\n${inlines(block.replace(/^> /gm, ''))}\n</blockquote>`;
-    }
-    return `<p>${inlines(block)}</p>`;
-  }).join('\n\n')).replace(/\{\{\s*(\w+)\s*\}\}/g, 
-    (outer, expr) => (vars.get(expr)) ? vars.get(expr) : outer
-  ).trim() + '\n';
+  const esc = (str) => escape ? markdownEscape(str) : str;
+  return codeblocks(input.replace(/\r\n/g, '\n'))
+    .flatMap(part => {
+      if (part.type === 'snippet') return [part.html];
+      return part.content.split('\n\n').map(block => {
+        block = block.trim();
+        if (!block) return null;
+        if (/^<.+?>/.test(block)) return esc(block);
+        const hm = block.match(/^(#{1,6}) (.+)$/);
+        if (hm) return `<h${hm[1].length}>${inlines(hm[2])}</h${hm[1].length}>`;
+        if (UL_PATTERN.test(block)) return parseList(block);
+        if (block.startsWith('> ')) {
+          return `<blockquote>\n${inlines(block.replace(/^> /gm, ''))}\n</blockquote>`;
+        }
+        return `<p>${inlines(block)}</p>`;
+      }).filter(Boolean).map(esc);
+    })
+    .join('\n\n').trim() + '\n';
 }
