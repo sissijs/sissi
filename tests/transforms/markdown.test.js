@@ -83,5 +83,10 @@ describe('markdown', () => {
     assert.equal(markdown(input), output);
   });
 
+  it('transforms mixed ordered/unordered nested lists correctly', async () => {
+    const [input, output] = await l('0013-mixed-nested-list');
+    assert.equal(markdown(input), output);
+  });
+
 
 });
