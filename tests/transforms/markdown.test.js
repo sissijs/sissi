@@ -78,5 +78,10 @@ describe('markdown', () => {
     assert.equal(markdown(input), output);
   });
 
-  
+  it('transforms deeply nested lists correctly', async () => {
+    const [input, output] = await l('0012-deeply-nested-list');
+    assert.equal(markdown(input), output);
+  });
+
+
 });
