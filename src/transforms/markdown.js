@@ -69,14 +69,15 @@ function parseList(block) {
 
   for (const li of listItems) {
     if (last !== null && li.indent > last.indent) {
-      stack.push(currentList);
-      currentList = last.childList  = {
+      stack.push({list: currentList, indent: last.indent});
+      currentList = last.childList = {
         start: parseStart(li.prefix),
         items: []
       };
-    } else
-    if (last && li.indent < last.indent && stack.length > 0) {
-      currentList = stack.pop();
+    } else if (last && li.indent < last.indent) {
+      while (stack.length > 0 && stack[stack.length - 1].indent >= li.indent) {
+        currentList = stack.pop().list;
+      }
     }
     const item = {...li, childList: null};
     currentList.items.push(item);
