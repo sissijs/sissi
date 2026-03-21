@@ -7,3 +7,5 @@ There are more *inline elements*.
 Lorem **inline** dolor __sit__ amet.
 
 Inline `code` element.
+
+Use `foo` and `bar` together.
