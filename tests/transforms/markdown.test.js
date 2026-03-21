@@ -88,5 +88,10 @@ describe('markdown', () => {
     assert.equal(markdown(input), output);
   });
 
+  it('transforms inline elements inside block-level elements correctly', async () => {
+    const [input, output] = await l('0014-inlines-in-blocks');
+    assert.equal(markdown(input), output);
+  });
+
 
 });
