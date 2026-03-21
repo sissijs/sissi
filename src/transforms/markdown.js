@@ -1,5 +1,6 @@
 const MAGIC = [
   [/ $/gm, '<br/>'],
+  [/~~(.+?)~~/g, '<del>$1</del>'],
   [/\*\*(.+?)\*\*/g, '<strong>$1</strong>'],
   [/__(.+?)__/g, '<strong>$1</strong>'],
   [/\*(.+?)\*/g, '<em>$1</em>'],
@@ -16,8 +17,9 @@ const MAGIC = [
   ]
 ];
 
-const UL_PATTERN = /((\s*)(\-|(?:(?:\d+\.)+)) (.+)\n)+/
+const UL_PATTERN = /^[ \t]*(?:-|(?:\d+\.)+) /m
 const ULLI_PATTERN = /(\s*)(\-|(?:(?:\d+\.)+)) (.+)\n?/g
+const HR_PATTERN = /^(?:(?:-[ \t]*){3,}|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})$/
 
 function inlines(str) {
   let result = str
@@ -31,7 +33,13 @@ function renderList(list) {
   let u = Number.isNaN(list.start)
   let html = u ? '<ul>' : `<ol${list.start!==1?` start="${list.start}"`:''}>`;
   for (const li of list.items) {
-    html += '<li>' + inlines(li.content);
+    const taskMatch = li.content.match(/^\[([ x])\] (.*)$/);
+    if (taskMatch) {
+      const checked = taskMatch[1] === 'x' ? ' checked' : '';
+      html += `<li><input type="checkbox" disabled${checked}> ${inlines(taskMatch[2])}`;
+    } else {
+      html += '<li>' + inlines(li.content);
+    }
     if (li.childList) {
       html+=renderList(li.childList);
     }
@@ -80,6 +88,57 @@ function parseList(block) {
   return renderList(list);
 }
 
+function parseTable(block) {
+  const rows = block.split('\n');
+  if (rows.length < 2) return null;
+  if (!/^\|?[\s|:\-]+\|?$/.test(rows[1])) return null;
+
+  const parseRow = (row) =>
+    row.replace(/^\||\|$/g, '').split('|').map(s => s.trim());
+
+  const aligns = parseRow(rows[1]).map(s => {
+    if (/^:-+:$/.test(s)) return 'center';
+    if (/^-+:$/.test(s)) return 'right';
+    if (/^:-+$/.test(s)) return 'left';
+    return null;
+  });
+
+  const a = (i) => aligns[i] ? ` style="text-align:${aligns[i]}"` : '';
+  const thead = '<tr>' + parseRow(rows[0]).map((h, i) => `<th${a(i)}>${inlines(h)}</th>`).join('') + '</tr>';
+  const tbody = rows.slice(2).map(row =>
+    '<tr>' + parseRow(row).map((cell, i) => `<td${a(i)}>${inlines(cell)}</td>`).join('') + '</tr>'
+  ).join('\n');
+
+  return `<table>\n<thead>\n${thead}\n</thead>\n<tbody>\n${tbody}\n</tbody>\n</table>`;
+}
+
+// Split a block at ATX headings, HRs, and setext underlines so that
+// adjacent block elements without blank lines between them are handled correctly.
+function splitAtSelfTerminating(block) {
+  const lines = block.split('\n');
+  const result = [];
+  let pending = [];
+
+  for (const line of lines) {
+    const isATX = /^#{1,6} /.test(line);
+    const isSetextUnder = pending.length > 0 && (/^=+$/.test(line) || /^-+$/.test(line));
+    const isHR = !isSetextUnder && HR_PATTERN.test(line);
+
+    if (isATX || isHR) {
+      if (pending.length) { result.push(pending.join('\n')); pending = []; }
+      result.push(line);
+    } else if (isSetextUnder) {
+      pending.push(line);
+      result.push(pending.join('\n'));
+      pending = [];
+    } else {
+      pending.push(line);
+    }
+  }
+  if (pending.length) result.push(pending.join('\n'));
+  return result;
+}
+
 function codeblocks(str) {
   const parts = [];
   str.split(/\n```/g).forEach((part, idx) => {
@@ -103,10 +162,11 @@ function codeblocks(str) {
 }
 
 export function markdownEscape(str) {
-  return str.replace(/\\([a-z\/\\`\{\}])/, '$1').replace(/(.?)([<>&])(.?)/g, 
-    (_, before, char, after) => 
-      before + (/[^\s]+/.test(before) || /[^\s]+/.test(after) ? char:`&${{'<':'lt','>':'gt','&':'amp'}[char]};`) + after
-    );
+  return str
+    .replace(/\\([a-z\/\\`\{\}])/g, '$1')
+    .replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g, '&amp;')
+    .replace(/(?<!\S)<(?!\S)/g, '&lt;')
+    .replace(/(?<!\S)>(?!\S)/g, '&gt;');
 }
 
 export function markdown(input, escape = true) {
@@ -117,15 +177,29 @@ export function markdown(input, escape = true) {
   return codeblocks(input.replace(/\r\n/g, '\n'))
     .flatMap(part => {
       if (part.type === 'snippet') return [part.html];
-      return part.content.split('\n\n').map(block => {
+      return part.content.split('\n\n').flatMap(block => {
+        block = block.trim();
+        return block ? splitAtSelfTerminating(block) : [];
+      }).map(block => {
         block = block.trim();
         if (!block) return null;
         if (/^<.+?>/.test(block)) return esc(block);
+        if (HR_PATTERN.test(block)) return '<hr/>';
         const hm = block.match(/^(#{1,6}) (.+)$/);
         if (hm) return `<h${hm[1].length}>${inlines(hm[2])}</h${hm[1].length}>`;
+        const sm = block.match(/^(.+)\n(=+|-+)$/s);
+        if (sm) {
+          const level = sm[2][0] === '=' ? 1 : 2;
+          return `<h${level}>${inlines(sm[1])}</h${level}>`;
+        }
+        if (block.includes('|')) {
+          const table = parseTable(block);
+          if (table) return table;
+        }
         if (UL_PATTERN.test(block)) return parseList(block);
         if (block.startsWith('> ')) {
-          return `<blockquote>\n${inlines(block.replace(/^> /gm, ''))}\n</blockquote>`;
+          const inner = block.replace(/^>[ ]?/gm, '');
+          return `<blockquote>\n${markdown(inner, false).trimEnd()}\n</blockquote>`;
         }
         return `<p>${inlines(block)}</p>`;
       }).filter(Boolean).map(esc);
