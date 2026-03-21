@@ -169,4 +169,29 @@ describe('smol YAML', () => {
   it('should parse deeply nested YAML correctly', () => {
     assert.deepEqual(smolYAML(yamlDOOM), doom)
   });
+
+  it('should not crash on trailing key with no value', () => {
+    assert.deepEqual(smolYAML('name: Lea\ntags:'), { name: 'Lea', tags: [] });
+  });
+
+  it('should skip comment lines', () => {
+    assert.deepEqual(smolYAML('# a comment\nname: Lea'), { name: 'Lea' });
+    assert.deepEqual(smolYAML('  # indented comment\nname: Lea'), { name: 'Lea' });
+  });
+
+  it('should parse hyphenated keys', () => {
+    assert.deepEqual(smolYAML('x-forwarded-for: 127.0.0.1'), { 'x-forwarded-for': '127.0.0.1' });
+    assert.deepEqual(smolYAML('my-list:\n  - item'), { 'my-list': ['item'] });
+  });
+
+  it('should trim trailing whitespace from bare values', () => {
+    assert.equal(smolYAML('hello   '), 'hello');
+    assert.equal(smolYAML('42   '), 42);
+  });
+
+  it('should parse single-quoted strings', () => {
+    assert.equal(smolYAML("'hello'"), 'hello');
+    assert.equal(smolYAML("'it''s a quote'"), "it's a quote");
+    assert.deepEqual(smolYAML("name: 'Lea'"), { name: 'Lea' });
+  });
 });
