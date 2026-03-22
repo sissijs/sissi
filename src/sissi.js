@@ -9,6 +9,7 @@ import { readDataDir } from './data.js';
 import { handleTemplateFile } from './transforms/template-data.js';
 import { getDependencyMap, updateDependencyMap, walkDependencyMap } from './dependency-graph.js';
 import { resolve } from './resolver.js';
+import { buildCollections } from './collections.js';
 
 export class Sissi {
 
@@ -38,14 +39,16 @@ export class Sissi {
     if (! this.data) {
       this.data = await readDataDir(this.config);
     }
-    const files = (filter instanceof Array) ? filter : 
-      (await readdir(path.normalize(this.config.dir.input), {recursive: true})).filter(
+    const allFiles = await readdir(path.normalize(this.config.dir.input), {recursive: true});
+    const collections = await buildCollections(this.config, this.data, allFiles);
+    const buildData = { ...this.data, collections };
+    const files = (filter instanceof Array) ? filter : allFiles.filter(
       (file) => {
         if (! filter) return true;
         if (filter instanceof RegExp) return filter.test(file);
       }
     );
-    const writtenFiles = await Promise.all(files.map(file => this.processFile(file, eventEmitter)));
+    const writtenFiles = await Promise.all(files.map(file => this.processFile(file, eventEmitter, buildData)));
     return writtenFiles.filter(Boolean);
   }
 
@@ -130,15 +133,15 @@ export class Sissi {
    *   is emitted after the file is written so the dev server can trigger live-reload.
    * @returns {Promise<string|null>} The output file path, or `null` if the file was skipped.
    */
-  async processFile(inputFileName, eventEmitter) {
-    if (! this.data) {
+  async processFile(inputFileName, eventEmitter, data = null) {
+    if (! data && ! this.data) {
       this.data = await readDataDir(this.config);
     }
     if (inputFileName.startsWith('_') || inputFileName.includes(path.sep + '_') || path.parse(inputFileName).name.startsWith('_')) {
       return;
     }
 
-    const tpl = await handleTemplateFile(this.config, this.data, inputFileName);
+    const tpl = await handleTemplateFile(this.config, data || this.data, inputFileName);
     if (! tpl) {
       return null;
     }

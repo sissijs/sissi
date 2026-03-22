@@ -22,6 +22,9 @@ export class SissiConfig {
   extensions = new Map();
   filters = new Map(Object.entries(builtinFilters));
 
+  /** Custom collections registered via addCollection(). */
+  collections = new Map();
+
   constructor(options = null) {
     this.addPlugin(html);
     this.addPlugin(css);
@@ -94,6 +97,17 @@ export class SissiConfig {
    */
   setTemplateFormats(formats) {
     this.templateFormats = new Set(this.#parseFormats(formats));
+  }
+
+  /**
+   * Register a custom collection.
+   * Eleventy API compatible. The callback receives a CollectionsAPI instance and
+   * must return an array (or any value) to expose as `collections[name]`.
+   * @param {string} name
+   * @param {function} fn  async (collectionsApi) => any
+   */
+  addCollection(name, fn) {
+    this.collections.set(name, fn);
   }
 
   /**
