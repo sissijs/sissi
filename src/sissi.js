@@ -103,6 +103,12 @@ export class Sissi {
         }
         lastExec.set(event.filename, performance.now());
         console.log(`[${event.eventType}] ${event.filename}`);
+        const dataDir = path.normalize(this.config.dir.data || '_data');
+        if (event.filename === dataDir || event.filename.startsWith(dataDir + path.sep)) {
+          this.data = await readDataDir(this.config);
+          await this.build(null, eventEmitter);
+          continue;
+        }
         const deps = await getDependencyMap(
           this.config.dir.input,
           await readdir(path.normalize(this.config.dir.input), {recursive: true}),
