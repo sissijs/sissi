@@ -101,6 +101,15 @@ describe('template function', () => {
     assert.equal(result, '<h1>Hello</h1>')
   });
 
+  it('should not let safe bleed into subsequent expressions', async () => {
+    const result = await template('{{ content | safe }} {{ userInput }}')({
+      content: '<h1>Hello</h1>',
+      userInput: '<script>alert(1)</script>',
+    });
+
+    assert.equal(result, '<h1>Hello</h1> &lt;script&gt;alert(1)&lt;/script&gt;');
+  });
+
   it('should be able to apply a filter with additional parameters', async () => {
     const data = { greeting: 'Hello Lea' }
     const filters = new Map();
