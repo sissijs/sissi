@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto';
-import EventEmitter from 'events';
-import { readFile } from 'fs';
-import { createServer, IncomingMessage, ServerResponse } from 'node:http';
+import { readFile } from 'node:fs';
+import { createServer } from 'node:http';
 import path from 'node:path';
 
 import { getMime } from './mimes.js'
@@ -36,9 +35,11 @@ const DEVSERVER_JS = `
 })();
 `
 
-const WS_MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
 function wsHandshake(req, socket) {
+  // The magic hardcoded GUID is defined in the WebSocket RFC (RFC 6455)
+  // and necessary for the handshake
+  const WS_MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
   const key = req.headers['sec-websocket-key'];
   const accept = createHash('sha1').update(key + WS_MAGIC).digest('base64');
   socket.write(
