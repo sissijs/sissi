@@ -126,10 +126,22 @@ function sendFactory(req, res) {
   return { send, sendError };
 }
 
+/**
+ * Start the HTTP dev server with optional live-reload via WebSocket.
+ *
+ * @param {import('node:events').EventEmitter} [eventEmitter] - Emitter that broadcasts watch events to connected browsers.
+ * @param {string} [wwwRoot='dist'] - Directory to serve static files from.
+ * @param {object} [listenOptions] - Options passed to `server.listen()`, plus the extras below.
+ * @param {number} [listenOptions.port=8000] - Port to listen on. Defaults to the PORT env var or 8000.
+ * @param {string} [listenOptions.host='localhost'] - Host to bind to. Defaults to the HOST env var or 'localhost'.
+ * @param {AbortSignal} [listenOptions.signal] - When aborted, closes the server and all open connections.
+ * @returns {Promise<import('node:http').Server>} Resolves with the server instance once it is listening.
+ */
 export function serve(eventEmitter = null, wwwRoot = 'dist', listenOptions) {
   return new Promise((resolve) => {
-    const host = listenOptions?.host ?? process.env.HOST ?? 'localhost';
-    const port = listenOptions?.port ?? parseInt(process.env.PORT ?? '8000', 10);
+    const { signal, ...restListenOptions } = listenOptions ?? {};
+    const host = restListenOptions?.host ?? process.env.HOST ?? 'localhost';
+    const port = restListenOptions?.port ?? parseInt(process.env.PORT ?? '8000', 10);
     const server = createServer((req, res) => {
       const url = new URL(`http://${host}${port !== 80?`:${port}`:''}${req.url}`);
       const { send, sendError } = sendFactory(req, res);
@@ -162,7 +174,13 @@ export function serve(eventEmitter = null, wwwRoot = 'dist', listenOptions) {
       });
     });
     if (eventEmitter) setupWebSockets(server, eventEmitter);
-    server.listen({port, host, ...(listenOptions ?? {})}, () => {
+    if (signal) {
+      signal.addEventListener('abort', () => {
+        server.closeAllConnections();
+        server.close();
+      }, { once: true });
+    }
+    server.listen({port, host, ...restListenOptions}, () => {
       console.log(`[http]\tServer listening on http://${host}:${port}/`);
       resolve(server);
     });
