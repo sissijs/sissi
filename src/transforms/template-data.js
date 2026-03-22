@@ -54,13 +54,13 @@ export function template(str) {
   if (! str) {
     return async () => str;
   }
-  const defaultFilters = new Map();
-  let isSafe = false;
-  defaultFilters.set('safe', (input) => { isSafe = true; return input; })
   return async (data, providedFilters) => {
     const context = vm.createContext({...data});
-    const filters = mergeMaps(defaultFilters || new Map(), providedFilters || new Map())
     return (await replaceAsync(str, TEMPLATE_REGEX, async (_, templateString) => {
+      let isSafe = false;
+      const defaultFilters = new Map();
+      defaultFilters.set('safe', (input) => { isSafe = true; return input; });
+      const filters = mergeMaps(defaultFilters, providedFilters || new Map());
       const expressions = templateString.split('|').map(e => e.trim());
       const mainExpression = expressions[0];
       const filterExpressions = expressions.slice(1);
