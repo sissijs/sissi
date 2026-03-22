@@ -142,4 +142,9 @@ describe('markdown', () => {
     assert.ok(result.startsWith('<p>'));
   });
 
+  it('escapes HTML inside inline code spans', async () => {
+    const [input, output] = await l('0023-inline-code-escaping');
+    assert.equal(markdown(input), output);
+  });
+
 });

@@ -56,7 +56,16 @@ export function template(str) {
   }
   return async (data, providedFilters) => {
     const context = vm.createContext({...data});
-    return (await replaceAsync(str, TEMPLATE_REGEX, async (_, templateString) => {
+
+    // Extract <pre> and <code> blocks before template evaluation so that
+    // {{ }} inside code blocks is never interpreted as a template expression.
+    const snippets = [];
+    const withPlaceholders = str.replace(/<(pre|code)(\b[^>]*)?>[\s\S]*?<\/\1>/g, (match) => {
+      snippets.push(match);
+      return `\x00${snippets.length - 1}\x00`;
+    });
+
+    return (await replaceAsync(withPlaceholders, TEMPLATE_REGEX, async (_, templateString) => {
       let isSafe = false;
       const defaultFilters = new Map();
       defaultFilters.set('safe', (input) => { isSafe = true; return input; });
@@ -89,7 +98,9 @@ export function template(str) {
         result = await result;
       }
       return isSafe ? result : htmlEscape(result);
-    })).replace(/\\([\{\}])/gm, '$1');
+    }))
+    .replace(/\\([\{\}])/gm, '$1')
+    .replace(/\x00(\d+)\x00/g, (_, i) => snippets[parseInt(i)]);
   }
 }
 

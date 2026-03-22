@@ -48,6 +48,22 @@ describe('frontmatter', () => {
     assert.equal(body, noMatter);
   });
 
+  it('should stop at the first closing --- and not consume horizontal rules in the body', () => {
+    const input = `---
+layout: base.html
+---
+# Hello
+
+---
+
+Some content after a horizontal rule
+`;
+    const { data, body } = frontmatter(input);
+    assert.deepEqual(data, { layout: 'base.html' });
+    assert(body.includes('---'), 'horizontal rule should remain in body');
+    assert(body.includes('Some content after a horizontal rule'));
+  });
+
   it('should handle it nicely when there is an empyt frontmatter', () => {
     const { data, body } = frontmatter(emptyMatter);
     assert.equal(data, null);
