@@ -12,7 +12,13 @@ import { smolYAML } from './transforms/smolyaml.js';
 export async function readDataDir(config) {
   const relativeDataDir = path.normalize(path.join(config.dir.input || '.', config.dir.data || '_data'));
   const dataDir = path.resolve(relativeDataDir);
-  const files = await readdir(path.normalize(dataDir), {recursive: true});
+  let files;
+  try {
+    files = await readdir(path.normalize(dataDir), {recursive: true});
+  } catch (err) {
+    if (err.code === 'ENOENT') return {};
+    throw err;
+  }
   const result = {}
   for (const dataFilePath of files) {
     const absPath = path.join(dataDir, dataFilePath);
