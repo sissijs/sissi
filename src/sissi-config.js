@@ -55,7 +55,7 @@ export class SissiConfig {
    * @param {function} filterFunction 
    */
   addFilter(filter, filterFunction) {
-    this.filters.add(filter, filterFunction);
+    this.filters.set(filter, filterFunction);
   }
 
   /**
