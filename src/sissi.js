@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { SissiConfig } from './sissi-config.js';
 import { serve } from './httpd.js';
-import EventEmitter from 'node:stream';
+import EventEmitter from 'node:events';
 import { readDataDir } from './data.js';
 import { handleTemplateFile } from './transforms/template-data.js';
 import { getDependencyMap, walkDependencyMap } from './dependency-graph.js';
