@@ -10,10 +10,6 @@ Collections let you group pages together and iterate over them in templates — 
 
 Before any template is rendered, Sissi scans all input files, reads their frontmatter, and assembles a `collections` object. That object is then available in every template during the build.
 
-```
-Scan all files → Read frontmatter → Build collections → Render templates with collections
-```
-
 ---
 
 ## `collections.all`
