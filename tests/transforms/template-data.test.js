@@ -160,6 +160,18 @@ describe('template function', () => {
     )
   });
 
+  it('should evaluate multi-line pipe expressions', async () => {
+    const filters = new Map();
+    filters.set('shout', (str) => (str || '').toUpperCase());
+    filters.set('exclaim', (str) => str + '!!!');
+    const tpl = `{{
+  title
+  | shout
+  | exclaim
+}}`;
+    assert.equal(await template(tpl)({ title: 'hello' }, filters), 'HELLO!!!');
+  });
+
   it('should evaluate multi-line expressions inside {{ }}', async () => {
     const data = { items: ['a', 'b', 'c'] };
     const tpl = `{{
