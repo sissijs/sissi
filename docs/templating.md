@@ -62,7 +62,11 @@ You can serialize objects to JSON:
 ### Iterate through array (`each`)
 
 ```html
-{\{ fetchJson('people.json') | async | eachItem: (item) => `<li>${item}</li>` }\}
+{\{
+  fetchJson('people.json')
+  | async
+  | each: (item) => `<li>${item}</li>`
+}\}
 ```
 
 ### Work in progress
@@ -98,7 +102,12 @@ You can run arbitrary JavaScript inside the curly brackets:
 
 ```html
 <ul>
-  {\{ people().map(person => `<li>${person}</li>`).join('') | async }\}
+  {\{
+    people()
+      .map(person => `<li>${person}</li>`)
+      .join('')
+    | async
+  }\}
 </ul>
 ```
 

@@ -22,7 +22,12 @@ Every template file is automatically added to `collections.all`, regardless of w
 
 ```html
 <ul>
-  {\{ collections.all.map(item => `<li><a href="${item.page.url}">${item.data.title}</a></li>`).join('') | safe }\}
+  {\{
+    collections.all
+      .map(item => `<li><a href="${item.page.url}">${item.data.title}</a></li>`)
+      .join('')
+    | safe
+  }\}
 </ul>
 ```
 
@@ -54,7 +59,12 @@ Both `collections.post` and `collections.featured` will contain this page. Acces
 
 ```html
 <ul>
-  {\{ collections.post.map(item => `<li><a href="${item.page.url}">${item.data.title}</a></li>`).join('') | safe }\}
+  {\{
+    collections.post
+      .map(item => `<li><a href="${item.page.url}">${item.data.title}</a></li>`)
+      .join('')
+    | safe
+  }\}
 </ul>
 ```
 
@@ -85,7 +95,13 @@ All collections are sorted ascending by date (oldest first). The `page.date` fie
 To sort descending (newest first), reverse the array in your template:
 
 ```html
-{\{ collections.post.toReversed().map(item => `<li>${item.data.title}</li>`).join('') | safe }\}
+{\{
+  collections.post
+    .toReversed()
+    .map(item => `<li>${item.data.title}</li>`)
+    .join('')
+  | safe
+}\}
 ```
 
 ---
@@ -162,10 +178,14 @@ Three functions are available in every template to navigate adjacent items in a 
 
 ```html
 <!-- Link to the previous post -->
-{{ getPreviousCollectionItem(collections.post, page)?.page?.url }}
+{{
+  getPreviousCollectionItem(collections.post, page)?.page?.url
+}}
 
 <!-- Link to the next post -->
-{{ getNextCollectionItem(collections.post, page)?.page?.url }}
+{{
+  getNextCollectionItem(collections.post, page)?.page?.url
+}}
 
 <!-- Zero-based position of this page in the collection -->
 {{ getCollectionItemIndex(collections.post, page) }}
