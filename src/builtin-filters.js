@@ -79,7 +79,7 @@ export function sort(array) {
  * @param {Iterable} array
  * @param {number} amount 
  */
-export function last(amount = 1) {
+export function last(array, amount = 1) {
   return Array.from(array).reverse().slice(0, amount);
 }
 
