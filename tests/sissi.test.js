@@ -25,8 +25,52 @@ describe('sissi', () => {
 
     writtenFiles.sort();
 
-    assert.deepEqual(writtenFiles, 
+    assert.deepEqual(writtenFiles,
       ['css/styles.css', 'imprint.html', 'index.html', 'test.html']
     );
+  });
+
+  it('should build exactly once on startup (via watch, not a separate build call)', async () => {
+    const config = new SissiConfig({
+      dir: { input: 'tests/fixtures/smallsite', output: '' }
+    });
+    const sissi = new Sissi(config);
+    sissi.dryMode = true;
+
+    let buildCount = 0;
+    const controller = new AbortController();
+    const originalBuild = sissi.build.bind(sissi);
+    sissi.build = async (...args) => {
+      buildCount++;
+      const result = await originalBuild(...args);
+      controller.abort(); // exit the watcher loop right after the initial build
+      return result;
+    };
+
+    await sissi.watch(null, { signal: controller.signal });
+
+    assert.equal(buildCount, 1, 'build() should be called exactly once on startup');
+  });
+
+  it('serve() should build once and stop cleanly when aborted', async () => {
+    const config = new SissiConfig({
+      dir: { input: 'tests/fixtures/smallsite', output: 'public' },
+    });
+    const sissi = new Sissi(config);
+    sissi.dryMode = true;
+
+    let buildCount = 0;
+    const controller = new AbortController();
+    const originalBuild = sissi.build.bind(sissi);
+    sissi.build = async (...args) => {
+      buildCount++;
+      const result = await originalBuild(...args);
+      controller.abort();
+      return result;
+    };
+
+    await sissi.serve({ signal: controller.signal, port: 0 });
+
+    assert.equal(buildCount, 1, 'build() should be called exactly once');
   });
 });
