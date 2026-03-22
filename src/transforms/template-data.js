@@ -5,7 +5,7 @@ import { resolve } from '../resolver.js';
 import { SissiConfig } from "../sissi-config.js";
 import { replaceAsync } from '../utils/replace-async.js';
 
-const TEMPLATE_REGEX = /\{\{\s*(.+?)\s*\}\}/g;
+const TEMPLATE_REGEX = /\{\{\s*(.+?)\s*\}\}/gs;
 
 function mergeMaps(map1, map2) {
   return new Map([...map1, ...map2]);

@@ -160,6 +160,32 @@ describe('template function', () => {
     )
   });
 
+  it('should evaluate multi-line expressions inside {{ }}', async () => {
+    const data = { items: ['a', 'b', 'c'] };
+    const tpl = `{{
+  items
+    .map(i => i.toUpperCase())
+    .join(', ')
+}}`;
+    assert.equal(await template(tpl)(data, new Map()), 'A, B, C');
+  });
+
+  it('should support multi-line IIFE lambdas like those in the collections docs', async () => {
+    const data = {
+      prev: { url: '/prev.html', title: 'Previous' },
+      next: { url: '/next.html', title: 'Next' },
+    };
+    const tpl = `{{ (() => {
+  const prevLink = prev ? \`<a href="\${prev.url}">\${prev.title}</a>\` : '';
+  const nextLink = next ? \`<a href="\${next.url}">\${next.title}</a>\` : '';
+  return [prevLink, nextLink].filter(Boolean).join(' · ');
+})() | safe }}`;
+    assert.equal(
+      await template(tpl)(data, new Map()),
+      '<a href="/prev.html">Previous</a> · <a href="/next.html">Next</a>'
+    );
+  });
+
 });
 
 describe('handleTemplateFile function', () => {
