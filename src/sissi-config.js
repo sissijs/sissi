@@ -17,7 +17,6 @@ export class SissiConfig {
   watchFileDelta = 1000;
   naming = defaultNaming;
 
-  templateFormats = new Map();
   extensions = new Map();
   filters = new Map(Object.entries(builtinFilters));
 
@@ -59,12 +58,13 @@ export class SissiConfig {
   }
 
   /**
-   * Add extensions as a valid template language to process
-   * @param  {...string} formats 
+   * Eleventy API compatibility stub.
+   * In Eleventy, this controls which file extensions are processed as templates.
+   * In Sissi, template formats are registered implicitly via `addExtension()` inside each plugin.
+   * Wiring this to drive the build pipeline is future work.
+   * @param  {...string} _formats
    */
-  addTemplateFormats(...formats) {
-    for (const format of formats) {
-      this.templateFormats.set(format);
-    }
+  addTemplateFormats(..._formats) {
+    // no-op
   }
 }
