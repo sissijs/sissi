@@ -45,10 +45,7 @@ export class Sissi {
         if (filter instanceof RegExp) return filter.test(file);
       }
     );
-    const writtenFiles = [];
-    for (const file of files) {
-      writtenFiles.push(await this.processFile(file, eventEmitter));
-    }
+    const writtenFiles = await Promise.all(files.map(file => this.processFile(file, eventEmitter)));
     return writtenFiles.filter(Boolean);
   }
 
