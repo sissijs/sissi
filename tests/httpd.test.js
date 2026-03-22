@@ -1,5 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
+import EventEmitter from 'node:events';
 import { serve } from '../src/httpd.js';
 
 
@@ -14,6 +15,25 @@ describe('httpd tests', () => {
     const killSwitch = new AbortController();
     return [killSwitch, {host, port, signal: killSwitch.signal}]
   }
+
+  test('websocket live-reload events', async () => {
+    const emitter = new EventEmitter();
+    const [killSwitch, options] = getListenOptions();
+    await serve(emitter, 'tests/fixtures/httpd', options);
+
+    const received = await new Promise((resolve, reject) => {
+      const ws = new WebSocket(`ws://${options.host}:${options.port}/_dev-events`);
+      ws.addEventListener('open', () => {
+        emitter.emit('watch-event', { filename: 'style.css', page: { url: 'http://localhost/' } });
+      });
+      ws.addEventListener('message', (e) => { ws.close(); resolve(JSON.parse(e.data)); });
+      ws.addEventListener('error', reject);
+    });
+
+    killSwitch.abort();
+
+    assert.equal(received[0].filename, 'style.css');
+  });
 
   test('basic functionality', async () => {
     const [killSwitch, options] = getListenOptions();
@@ -49,7 +69,7 @@ describe('httpd tests', () => {
     }
     
     killSwitch.abort();
-    
+
     for (const reqTest of requestTests) {
       const [actualCode, actualType, actualBody] = reqTest.actual;
       const [expectedCode, expectedType, expectedBody] = reqTest.expected;
