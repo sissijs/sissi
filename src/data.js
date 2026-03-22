@@ -18,7 +18,9 @@ export async function readDataDir(config) {
     const absPath = path.join(dataDir, dataFilePath);
     const pathInfo = path.parse(absPath);
     if (pathInfo.ext === '.js') {
-      result[pathInfo.name] = (await import(absPath)).default;
+      // Append a timestamp to bust Node's ESM module cache on re-import during watch.
+      const url = new URL(`file://${absPath}?t=${Date.now()}`);
+      result[pathInfo.name] = (await import(url)).default;
     }
     if (pathInfo.ext === '.json') {
       result[pathInfo.name] = JSON.parse(await readFile(absPath, 
