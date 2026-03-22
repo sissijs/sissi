@@ -10,6 +10,7 @@ import { handleTemplateFile } from './transforms/template-data.js';
 import { getDependencyMap, updateDependencyMap, walkDependencyMap } from './dependency-graph.js';
 import { resolve } from './resolver.js';
 import { buildCollections } from './collections.js';
+import { getCollectionItemIndex, getPreviousCollectionItem, getNextCollectionItem } from './builtin-filters.js';
 
 export class Sissi {
 
@@ -41,7 +42,13 @@ export class Sissi {
     }
     const allFiles = await readdir(path.normalize(this.config.dir.input), {recursive: true});
     const collections = await buildCollections(this.config, this.data, allFiles);
-    const buildData = { ...this.data, collections };
+    const buildData = {
+      ...this.data,
+      collections,
+      getCollectionItemIndex,
+      getPreviousCollectionItem,
+      getNextCollectionItem,
+    };
     const files = (filter instanceof Array) ? filter : allFiles.filter(
       (file) => {
         if (! filter) return true;

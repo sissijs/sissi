@@ -109,3 +109,37 @@ export async function async(asyncInput) {
 export function each(array, callback) {
   return array.map(callback).join('');
 }
+
+/**
+ * Return the zero-based index of the current page in a collection.
+ * Matches by page.inputPath. Returns -1 if not found.
+ * @param {object[]} collection
+ * @param {object} page
+ * @returns {number}
+ */
+export function getCollectionItemIndex(collection, page) {
+  if (!Array.isArray(collection) || !page) return -1;
+  return collection.findIndex(item => item.page?.inputPath === page.inputPath);
+}
+
+/**
+ * Return the item before the current page in a collection, or null.
+ * @param {object[]} collection
+ * @param {object} page
+ * @returns {object|null}
+ */
+export function getPreviousCollectionItem(collection, page) {
+  const idx = getCollectionItemIndex(collection, page);
+  return idx > 0 ? collection[idx - 1] : null;
+}
+
+/**
+ * Return the item after the current page in a collection, or null.
+ * @param {object[]} collection
+ * @param {object} page
+ * @returns {object|null}
+ */
+export function getNextCollectionItem(collection, page) {
+  const idx = getCollectionItemIndex(collection, page);
+  return (idx !== -1 && idx < collection.length - 1) ? collection[idx + 1] : null;
+}

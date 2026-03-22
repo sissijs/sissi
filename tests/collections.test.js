@@ -5,6 +5,11 @@ import { mkdtemp, writeFile, readFile, rm, mkdir, realpath } from 'node:fs/promi
 import { tmpdir } from 'node:os';
 
 import { CollectionsAPI, buildCollections } from '../src/collections.js';
+import {
+  getCollectionItemIndex,
+  getPreviousCollectionItem,
+  getNextCollectionItem,
+} from '../src/builtin-filters.js';
 import { SissiConfig } from '../src/sissi-config.js';
 import { Sissi } from '../src/sissi.js';
 
@@ -360,5 +365,165 @@ describe('Sissi collections integration', () => {
 
     assert.equal(collections.post[0].page.inputPath, 'older.html');
     assert.equal(collections.post[1].page.inputPath, 'newer.html');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Collection item filters
+// ---------------------------------------------------------------------------
+
+describe('getCollectionItemIndex', () => {
+  const collection = [
+    { page: { inputPath: 'a.html' }, data: {} },
+    { page: { inputPath: 'b.html' }, data: {} },
+    { page: { inputPath: 'c.html' }, data: {} },
+  ];
+
+  it('returns the 0-based index of the page in the collection', () => {
+    assert.equal(getCollectionItemIndex(collection, { inputPath: 'a.html' }), 0);
+    assert.equal(getCollectionItemIndex(collection, { inputPath: 'b.html' }), 1);
+    assert.equal(getCollectionItemIndex(collection, { inputPath: 'c.html' }), 2);
+  });
+
+  it('returns -1 when the page is not in the collection', () => {
+    assert.equal(getCollectionItemIndex(collection, { inputPath: 'x.html' }), -1);
+  });
+
+  it('returns -1 when collection is empty', () => {
+    assert.equal(getCollectionItemIndex([], { inputPath: 'a.html' }), -1);
+  });
+
+  it('returns -1 when page is null or undefined', () => {
+    assert.equal(getCollectionItemIndex(collection, null), -1);
+    assert.equal(getCollectionItemIndex(collection, undefined), -1);
+  });
+});
+
+describe('getPreviousCollectionItem', () => {
+  const collection = [
+    { page: { inputPath: 'a.html' }, data: { title: 'A' } },
+    { page: { inputPath: 'b.html' }, data: { title: 'B' } },
+    { page: { inputPath: 'c.html' }, data: { title: 'C' } },
+  ];
+
+  it('returns the item before the current page', () => {
+    const prev = getPreviousCollectionItem(collection, { inputPath: 'b.html' });
+    assert.equal(prev.page.inputPath, 'a.html');
+  });
+
+  it('returns null for the first item (no previous)', () => {
+    assert.equal(getPreviousCollectionItem(collection, { inputPath: 'a.html' }), null);
+  });
+
+  it('returns null when page is not in the collection', () => {
+    assert.equal(getPreviousCollectionItem(collection, { inputPath: 'z.html' }), null);
+  });
+
+  it('returns null when collection is empty', () => {
+    assert.equal(getPreviousCollectionItem([], { inputPath: 'a.html' }), null);
+  });
+});
+
+describe('getNextCollectionItem', () => {
+  const collection = [
+    { page: { inputPath: 'a.html' }, data: { title: 'A' } },
+    { page: { inputPath: 'b.html' }, data: { title: 'B' } },
+    { page: { inputPath: 'c.html' }, data: { title: 'C' } },
+  ];
+
+  it('returns the item after the current page', () => {
+    const next = getNextCollectionItem(collection, { inputPath: 'b.html' });
+    assert.equal(next.page.inputPath, 'c.html');
+  });
+
+  it('returns null for the last item (no next)', () => {
+    assert.equal(getNextCollectionItem(collection, { inputPath: 'c.html' }), null);
+  });
+
+  it('returns null when page is not in the collection', () => {
+    assert.equal(getNextCollectionItem(collection, { inputPath: 'z.html' }), null);
+  });
+
+  it('returns null when collection is empty', () => {
+    assert.equal(getNextCollectionItem([], { inputPath: 'a.html' }), null);
+  });
+});
+
+describe('collection item filters: integration via template', () => {
+  async function makeTmpSite(files) {
+    const tmpDir = await realpath(await mkdtemp(path.join(tmpdir(), 'sissi-test-')));
+    for (const [name, content] of Object.entries(files)) {
+      const full = path.join(tmpDir, name);
+      await mkdir(path.dirname(full), { recursive: true });
+      await writeFile(full, content);
+    }
+    return tmpDir;
+  }
+
+  it('getPreviousCollectionItem filter renders prev post url in a template', async () => {
+    const tmpDir = await makeTmpSite({
+      'post-a.html': withFrontmatter('<p>A</p>', { title: 'Post A', tags: ['post'], date: '2024-01-01' }),
+      'post-b.html': withFrontmatter(
+        '{{ getPreviousCollectionItem(collections.post, page)?.page?.url }}',
+        { title: 'Post B', tags: ['post'], date: '2024-02-01' }
+      ),
+    });
+
+    try {
+      const outDir = path.join(tmpDir, 'public');
+      const config = new SissiConfig({ dir: { input: tmpDir, output: outDir } });
+      const sissi = new Sissi(config);
+      await sissi.build();
+
+      const output = await readFile(path.join(outDir, 'post-b.html'), 'utf8');
+      assert.ok(output.includes('post-a.html'));
+    } finally {
+      await rm(tmpDir, { recursive: true });
+    }
+  });
+
+  it('getNextCollectionItem filter renders next post url in a template', async () => {
+    const tmpDir = await makeTmpSite({
+      'post-a.html': withFrontmatter(
+        '{{ getNextCollectionItem(collections.post, page)?.page?.url }}',
+        { title: 'Post A', tags: ['post'], date: '2024-01-01' }
+      ),
+      'post-b.html': withFrontmatter('<p>B</p>', { title: 'Post B', tags: ['post'], date: '2024-02-01' }),
+    });
+
+    try {
+      const outDir = path.join(tmpDir, 'public');
+      const config = new SissiConfig({ dir: { input: tmpDir, output: outDir } });
+      const sissi = new Sissi(config);
+      await sissi.build();
+
+      const output = await readFile(path.join(outDir, 'post-a.html'), 'utf8');
+      assert.ok(output.includes('post-b.html'));
+    } finally {
+      await rm(tmpDir, { recursive: true });
+    }
+  });
+
+  it('getCollectionItemIndex filter returns the correct index', async () => {
+    const tmpDir = await makeTmpSite({
+      'post-a.html': withFrontmatter('<p>A</p>', { tags: ['post'], date: '2024-01-01' }),
+      'post-b.html': withFrontmatter('<p>B</p>', { tags: ['post'], date: '2024-02-01' }),
+      'post-c.html': withFrontmatter(
+        '{{ getCollectionItemIndex(collections.post, page) }}',
+        { tags: ['post'], date: '2024-03-01' }
+      ),
+    });
+
+    try {
+      const outDir = path.join(tmpDir, 'public');
+      const config = new SissiConfig({ dir: { input: tmpDir, output: outDir } });
+      const sissi = new Sissi(config);
+      await sissi.build();
+
+      const output = await readFile(path.join(outDir, 'post-c.html'), 'utf8');
+      assert.equal(output.trim(), '2');
+    } finally {
+      await rm(tmpDir, { recursive: true });
+    }
   });
 });
