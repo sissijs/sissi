@@ -101,6 +101,14 @@ describe('template function', () => {
     assert.equal(result, '<h1>Hello</h1>')
   });
 
+  it('should not evaluate {{ }} expressions inside <pre> or <code> blocks', async () => {
+    const pre = await template('<pre><code>{{ title }}</code></pre>')({ title: 'Hello' });
+    assert.equal(pre, '<pre><code>{{ title }}</code></pre>');
+
+    const code = await template('<p>Use <code>{{ title }}</code> here.</p>')({ title: 'Hello' });
+    assert.equal(code, '<p>Use <code>{{ title }}</code> here.</p>');
+  });
+
   it('should not let safe bleed into subsequent expressions', async () => {
     const result = await template('{{ content | safe }} {{ userInput }}')({
       content: '<h1>Hello</h1>',

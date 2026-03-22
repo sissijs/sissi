@@ -5,7 +5,7 @@ const MAGIC = [
   [/__(.+?)__/g, '<strong>$1</strong>'],
   [/\*(.+?)\*/g, '<em>$1</em>'],
   [/_(.+?)_/g, '<em>$1</em>'],
-  [/`(.+?)`/g, '<code>$1</code>'],
+  [/`(.+?)`/g, (_, code) => `<code>${code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`],
   [/<(https?:\/\/.+)>/g, '<a href="$1">$1</a>'],
   [
     /\!\[(.+?)\]\((.+?)\)/g,
