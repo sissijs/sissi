@@ -37,3 +37,29 @@ address {
   padding: 1rem;
 }
 
+table {
+  border-collapse: collapse;
+  width: 100%;
+  overflow-x: auto;
+  font-size: 0.9em;
+}
+
+th, td {
+  padding: 0.5rem 1rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: color-mix(in oklch, currentColor 20%, transparent);
+}
+
+thead th {
+  font-weight: 600;
+  border-bottom-width: 2px;
+  border-bottom-color: color-mix(in oklch, currentColor 40%, transparent);
+}
+
+tbody tr:nth-child(even) {
+  background: color-mix(in oklch, currentColor 5%, transparent);
+}
+
