@@ -17,6 +17,8 @@ export class SissiConfig {
   watchFileDelta = 1000;
   naming = defaultNaming;
 
+  /** Set of extensions that are compiled as templates. Everything else is passthrough-copied. */
+  templateFormats = new Set();
   extensions = new Map();
   filters = new Map(Object.entries(builtinFilters));
 
@@ -39,13 +41,14 @@ export class SissiConfig {
   }
 
   /**
-   * add an extension to Sissi
-   * 
-   * @param {string} extension 
-   * @param {function} processingFunction 
+   * Register a plugin compiler for a file extension.
+   * Also implicitly registers the extension as a template format.
+   * @param {string} extension
+   * @param {object} processingFunction
    */
   addExtension(extension, processingFunction) {
     this.extensions.set(extension, processingFunction);
+    this.templateFormats.add(extension);
   }
 
   /**
@@ -58,13 +61,50 @@ export class SissiConfig {
   }
 
   /**
-   * Eleventy API compatibility stub.
-   * In Eleventy, this controls which file extensions are processed as templates.
-   * In Sissi, template formats are registered implicitly via `addExtension()` inside each plugin.
-   * Wiring this to drive the build pipeline is future work.
-   * @param  {...string} _formats
+   * Parse formats argument — accepts a comma-separated string or an array of strings.
+   * @param {string|string[]} formats
+   * @returns {string[]}
    */
-  addTemplateFormats(..._formats) {
-    // no-op
+  #parseFormats(formats) {
+    if (typeof formats === 'string') {
+      return formats.split(',').map(f => f.trim()).filter(Boolean);
+    }
+    return formats.flat();
+  }
+
+  /**
+   * Add file extensions to the set of known template formats.
+   * Eleventy API compatible. Accepts a comma-separated string or an array of strings.
+   *
+   * Note: built-in plugins call this automatically via `addExtension()`.
+   * You only need to call this directly when adding a format that has no
+   * compiler — i.e. you want it passthrough-copied but tracked as a known format.
+   * @param {string|string[]} formats
+   */
+  addTemplateFormats(formats) {
+    for (const format of this.#parseFormats(formats)) {
+      this.templateFormats.add(format);
+    }
+  }
+
+  /**
+   * Replace the set of known template formats entirely.
+   * Eleventy API compatible. Accepts a comma-separated string or an array of strings.
+   * @param {string|string[]} formats
+   */
+  setTemplateFormats(formats) {
+    this.templateFormats = new Set(this.#parseFormats(formats));
+  }
+
+  /**
+   * Eleventy API compatibility stub.
+   *
+   * In Eleventy, you must explicitly opt assets into the output with this method.
+   * In Sissi, all files not in `templateFormats` are passthrough-copied automatically —
+   * so this method is a no-op. It exists so Eleventy plugins that call it don't throw.
+   * @param {string|string[]|object} _paths
+   */
+  addPassthroughCopy(_paths) {
+    // no-op: Sissi passthrough-copies everything not in templateFormats by default
   }
 }
