@@ -4,7 +4,7 @@ import md from "./md.js";
 import { defaultNaming } from "./naming.js";
 import * as builtinFilters from './builtin-filters.js';
 
-export class SissiConfig {
+export class SindieConfig {
   
   dir = {
     output: 'public',
@@ -114,11 +114,11 @@ export class SissiConfig {
    * Eleventy API compatibility stub.
    *
    * In Eleventy, you must explicitly opt assets into the output with this method.
-   * In Sissi, all files not in `templateFormats` are passthrough-copied automatically —
+   * In Sindie, all files not in `templateFormats` are passthrough-copied automatically —
    * so this method is a no-op. It exists so Eleventy plugins that call it don't throw.
    * @param {string|string[]|object} _paths
    */
   addPassthroughCopy(_paths) {
-    // no-op: Sissi passthrough-copies everything not in templateFormats by default
+    // no-op: Sindie passthrough-copies everything not in templateFormats by default
   }
 }

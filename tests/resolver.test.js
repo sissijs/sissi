@@ -2,7 +2,7 @@ import { describe, it, mock, before, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 
-import { SissiConfig } from '../src/sissi-config.js';
+import { SindieConfig } from '../src/sindie-config.js';
 import { resolve } from '../src/resolver.js';
 
 
@@ -11,7 +11,7 @@ describe('resolve', () => {
   let config;
   
   before(() => {
-    config = new SissiConfig({
+    config = new SindieConfig({
       dir: {
         input: 'docs',
         output: 'dist',

@@ -6,6 +6,28 @@
   outline: 2px solid #fff;
 }
 
+::selection {
+  background: var(--anchor);
+  color: #222;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--fg) 50%, transparent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fg);
+}
+
 html {
   font-size: 110%;
   line-height: 1.4;
@@ -61,5 +83,12 @@ thead th {
 
 tbody tr:nth-child(even) {
   background: color-mix(in oklch, currentColor 5%, transparent);
+}
+
+/* retro code block — flat pixel-era drop shadow */
+pre {
+  border: 1px solid color-mix(in oklch, var(--fg) 40%, transparent);
+  box-shadow: 4px 4px 0 color-mix(in oklch, var(--fg) 25%, transparent);
+  border-radius: 0;
 }
 

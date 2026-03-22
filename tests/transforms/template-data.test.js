@@ -5,7 +5,7 @@ import path from 'node:path';
 import { createContext } from 'node:vm';
 
 import { handleTemplateFile, parseFilterExpression, template } from '../../src/transforms/template-data.js';
-import { SissiConfig } from '../../src/sissi-config.js';
+import { SindieConfig } from '../../src/sindie-config.js';
 import md from '../../src/md.js';
 import * as builtinFilters from '../../src/builtin-filters.js';
 
@@ -205,7 +205,7 @@ describe('handleTemplateFile function', () => {
   const withFrontmatter = (str, data) => `---json\n${JSON.stringify(data)}\n---\n${str}`
 
   it('should work with basic html files without specifying a layout', async () => {
-    const config = new SissiConfig();
+    const config = new SindieConfig();
     config.addExtension(md);
 
     const vFS = new Map();
@@ -223,7 +223,7 @@ describe('handleTemplateFile function', () => {
   });
 
   it('should work with basic html files with specifying a layout', async () => {
-    const config = new SissiConfig();
+    const config = new SindieConfig();
     config.addExtension(md);
 
     const vFS = new Map();
@@ -242,7 +242,7 @@ describe('handleTemplateFile function', () => {
   });
 
   it('should work with the default markdown plugin', async () => {
-    const config = new SissiConfig();
+    const config = new SindieConfig();
     config.addExtension(md);
 
     const vFS = new Map();
@@ -261,7 +261,7 @@ describe('handleTemplateFile function', () => {
   });
 
   it('should throw an error when a non-existant file is specified', async () => {
-    const config = new SissiConfig();
+    const config = new SindieConfig();
     config.addExtension(md);
 
     const vFS = new Map();
@@ -280,7 +280,7 @@ describe('handleTemplateFile function', () => {
   });
 
   it('should throw an error when a non-existant file is specified as layout', async () => {
-    const config = new SissiConfig();
+    const config = new SindieConfig();
     config.addExtension(md);
 
     const vFS = new Map();
@@ -299,7 +299,7 @@ describe('handleTemplateFile function', () => {
   });
 
   it('should use provided data in the template', async () => {
-    const config = new SissiConfig();
+    const config = new SindieConfig();
     config.addExtension(md);
     const vFS = new Map();
 
@@ -321,7 +321,7 @@ describe('handleTemplateFile function', () => {
   });
 
   it('should override provided data with frontmatter data in the template', async () => {
-    const config = new SissiConfig();
+    const config = new SindieConfig();
     config.addExtension(md);
     const vFS = new Map();
 
@@ -342,8 +342,8 @@ describe('handleTemplateFile function', () => {
     assert.equal(result.content, TEST_EXPECTED);
   });
 
-  it('should populate data provided by sissi in the template', async () => {
-    const config = new SissiConfig();
+  it('should populate data provided by sindie in the template', async () => {
+    const config = new SindieConfig();
     config.addExtension(md);
     const vFS = new Map();
 

@@ -2,8 +2,8 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict';
 import path from 'node:path'
 import { handleTemplateFile } from '../src/transforms/template-data.js';
-import { SissiConfig } from '../src/sissi-config.js';
-import { htmlentities } from '../src/builtin-filters.js';
+import { SindieConfig } from '../src/sindie-config.js';
+import { htmlentities, last } from '../src/builtin-filters.js';
 describe('builtin filters', () => {
 
   const dummyResolver = (map) => (...paths) => map.get(path.normalize(path.join(...paths)));
@@ -22,7 +22,7 @@ describe('builtin filters', () => {
 
   describe('integration with template engine', () => {
     it('should format numbers via numberFormat filter', async () => {
-      const config = new SissiConfig();
+      const config = new SindieConfig();
   
       const vFS = new Map();
       vFS.set('index.html', '{{ thousandPi | numberFormat: numberFormatOptions, "de-DE" }}');
@@ -37,7 +37,7 @@ describe('builtin filters', () => {
     });
   
     it('should format currencies via currency filter', async () => {
-      const config = new SissiConfig();
+      const config = new SindieConfig();
   
       const vFS = new Map();
       vFS.set('index.html', '{{ million | currency: "eur", "de-DE" }}');
@@ -52,7 +52,7 @@ describe('builtin filters', () => {
     });
   
     it('should format dates via date filter', async () => {
-      const config = new SissiConfig();
+      const config = new SindieConfig();
   
       const vFS = new Map();
       vFS.set('index.html', '{{ newYear | date: dateFormatOptions, "de-DE" }}');
@@ -67,7 +67,7 @@ describe('builtin filters', () => {
     });
   
     it('should serialize json', async () => {
-      const config = new SissiConfig();
+      const config = new SindieConfig();
   
       const vFS = new Map();
       vFS.set('index.html', '{{ answer | json }}');

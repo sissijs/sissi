@@ -2,9 +2,7 @@
 title: Templating
 layout: base.html
 ---
-# {{ title }}
-
-Sissi comes with a basic markdown and html template engine.
+Sindie comes with a basic markdown and html template engine.
 
 ## HTML Includes
 
@@ -16,7 +14,7 @@ You can include HTML via the html-include tag. It will fetch the partial HTML sn
 
 ## Template Data
 
-Sissi supports a "poor girl's handlebars". It looks for expressions wrapped in double curly braces and replaces them with the data accordingly.  More details on this is in the next section about data.
+Sindie supports a "poor girl's handlebars". It looks for expressions wrapped in double curly braces and replaces them with the data accordingly. More details are in the [Data](/data) section.
 
 If you put a `meta.json` inside the data dir, you can access it via curly brace notation:
 

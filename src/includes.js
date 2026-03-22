@@ -2,10 +2,10 @@ import path from 'node:path';
 import { handleTemplateFile } from './transforms/template-data.js';
 
 /**
- * Language-agnostic include method to handle includes in sissi
+ * Language-agnostic include method to handle includes in sindie
  * @param {string} inputContent the content
  * @param {string} inputPath the full path to the file processed
- * @param {SissiConfig} config the configuration
+ * @param {SindieConfig} config the configuration
  * @param {any} data the data object
  * @param {string} includePath the include path to be used. If nullish, it's relative to the inputPath
  * @param {Regexp} regex the regular expression to match include directives

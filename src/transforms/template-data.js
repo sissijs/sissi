@@ -2,7 +2,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { frontmatter } from './frontmatter.js';
 import { resolve } from '../resolver.js';
-import { SissiConfig } from "../sissi-config.js";
+import { SindieConfig } from "../sindie-config.js";
 import { replaceAsync } from '../utils/replace-async.js';
 
 const TEMPLATE_REGEX = /\{\{\s*(.+?)\s*\}\}/gs;
@@ -107,7 +107,7 @@ export function template(str) {
 /**
  * Complete Template processing function
  * 
- * @param {SissiConfig} config 
+ * @param {SindieConfig} config 
  * @param {any} data 
  * @param {string} inputFile 
  * @returns {Promise<{content: Buffer|string, filename}>} the content file name and the output file name

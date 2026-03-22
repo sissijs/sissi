@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, watch, readFile, writeFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 
-import { SissiConfig } from './sissi-config.js';
+import { SindieConfig } from './sindie-config.js';
 import { serve } from './httpd.js';
 import EventEmitter from 'node:events';
 import { readDataDir } from './data.js';
@@ -12,13 +12,13 @@ import { resolve } from './resolver.js';
 import { buildCollections } from './collections.js';
 import { getCollectionItemIndex, getPreviousCollectionItem, getNextCollectionItem } from './builtin-filters.js';
 
-export class Sissi {
+export class Sindie {
 
   /**
-   * @param {SissiConfig} [config] - Project configuration. Defaults to a new SissiConfig with built-in plugins.
+   * @param {SindieConfig} [config] - Project configuration. Defaults to a new SindieConfig with built-in plugins.
    */
   constructor(config = null) {
-    this.config = config || new SissiConfig();
+    this.config = config || new SindieConfig();
     this.dryMode = false;
     this.data = null;
   }
@@ -28,7 +28,7 @@ export class Sissi {
    *
    * Reads all input files (or a filtered subset), processes each through the
    * plugin and template pipeline, and writes the results to the output directory.
-   * Skips the write step when {@link Sissi#dryMode} is `true`.
+   * Skips the write step when {@link Sindie#dryMode} is `true`.
    *
    * @param {string[]|RegExp|null} [filter] - Limit which files are built.
    *   Pass an array of file paths, a RegExp tested against each path, or `null` to build everything.
@@ -65,9 +65,9 @@ export class Sissi {
    *
    * Uses the dependency graph to determine which files depend on the changed
    * file, so only the minimum set of files is rebuilt on each change.
-   * Debounce interval is controlled by {@link SissiConfig#watchFileDelta}.
+   * Debounce interval is controlled by {@link SindieConfig#watchFileDelta}.
    *
-   * @param {import('node:events').EventEmitter} [eventEmitter] - Passed to {@link Sissi#build}
+   * @param {import('node:events').EventEmitter} [eventEmitter] - Passed to {@link Sindie#build}
    *   so the dev server can push live-reload signals to connected browsers.
    * @param {object} [watchOptions] - Extra options forwarded to `fs.watch()`.
    * @param {AbortSignal} [watchOptions.signal] - When aborted, stops the watcher and resolves the promise.
@@ -94,7 +94,7 @@ export class Sissi {
     if (! existsSync(inputDir)) {
       throw new Error(`Input directory Not found: ${this.config.dir.input}`);
     }
-    console.info(`[watch]\tSissi is watching ${this.config.dir.input}`);
+    console.info(`[watch]\tSindie is watching ${this.config.dir.input}`);
     let allFiles = await readdir(inputDir, { recursive: true });
     const deps = await getDependencyMap(inputDir, allFiles, this.config.resolve || resolve);
     try {

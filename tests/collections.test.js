@@ -10,8 +10,8 @@ import {
   getPreviousCollectionItem,
   getNextCollectionItem,
 } from '../src/builtin-filters.js';
-import { SissiConfig } from '../src/sissi-config.js';
-import { Sissi } from '../src/sissi.js';
+import { SindieConfig } from '../src/sindie-config.js';
+import { Sindie } from '../src/sindie.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -135,7 +135,7 @@ describe('CollectionsAPI', () => {
 
 describe('buildCollections', () => {
   it('collections.all contains all template files (regardless of tags)', async () => {
-    const config = new SissiConfig({ dir: { input: '.', output: 'public' } });
+    const config = new SindieConfig({ dir: { input: '.', output: 'public' } });
     config.resolve = makeVFS([
       ['index.html', '<h1>Home</h1>'],
       ['about.html', '<p>About</p>'],
@@ -148,7 +148,7 @@ describe('buildCollections', () => {
   });
 
   it('each item in collections.all has page, data, content, and rawInput fields', async () => {
-    const config = new SissiConfig({ dir: { input: '.', output: 'public' } });
+    const config = new SindieConfig({ dir: { input: '.', output: 'public' } });
     config.resolve = makeVFS([
       ['index.html', withFrontmatter('<h1>Home</h1>', { title: 'Home' })],
     ]);
@@ -165,7 +165,7 @@ describe('buildCollections', () => {
   });
 
   it('builds tag-based collections from frontmatter tags', async () => {
-    const config = new SissiConfig({ dir: { input: '.', output: 'public' } });
+    const config = new SindieConfig({ dir: { input: '.', output: 'public' } });
     config.resolve = makeVFS([
       ['post-a.html', withFrontmatter('<p>A</p>', { tags: ['post'] })],
       ['post-b.html', withFrontmatter('<p>B</p>', { tags: ['post', 'featured'] })],
@@ -186,7 +186,7 @@ describe('buildCollections', () => {
   });
 
   it('string tags value (not array) also creates a tag collection', async () => {
-    const config = new SissiConfig({ dir: { input: '.', output: 'public' } });
+    const config = new SindieConfig({ dir: { input: '.', output: 'public' } });
     config.resolve = makeVFS([
       ['post.html', withFrontmatter('<p>Post</p>', { tags: 'post' })],
     ]);
@@ -198,7 +198,7 @@ describe('buildCollections', () => {
   });
 
   it('eleventyExcludeFromCollections: true excludes from all collections including all', async () => {
-    const config = new SissiConfig({ dir: { input: '.', output: 'public' } });
+    const config = new SindieConfig({ dir: { input: '.', output: 'public' } });
     config.resolve = makeVFS([
       ['secret.html', withFrontmatter('<p>Secret</p>', { eleventyExcludeFromCollections: true, tags: ['post'] })],
       ['public.html', withFrontmatter('<p>Public</p>', { tags: ['post'] })],
@@ -214,7 +214,7 @@ describe('buildCollections', () => {
   });
 
   it('eleventyExcludeFromCollections: [tags] excludes from specific tag collections but stays in all', async () => {
-    const config = new SissiConfig({ dir: { input: '.', output: 'public' } });
+    const config = new SindieConfig({ dir: { input: '.', output: 'public' } });
     config.resolve = makeVFS([
       ['page.html', withFrontmatter('<p>Page</p>', {
         tags: ['post', 'featured'],
@@ -233,7 +233,7 @@ describe('buildCollections', () => {
   });
 
   it('skips passthrough-copied files (non-template extensions)', async () => {
-    const config = new SissiConfig({ dir: { input: '.', output: 'public' } });
+    const config = new SindieConfig({ dir: { input: '.', output: 'public' } });
     config.resolve = makeVFS([
       ['image.png', Buffer.from('fake-png')],
       ['index.html', '<h1>Home</h1>'],
@@ -246,7 +246,7 @@ describe('buildCollections', () => {
   });
 
   it('skips underscore-prefixed files', async () => {
-    const config = new SissiConfig({ dir: { input: '.', output: 'public' } });
+    const config = new SindieConfig({ dir: { input: '.', output: 'public' } });
     config.resolve = makeVFS([
       ['_partial.html', '<p>partial</p>'],
       ['index.html', '<h1>Home</h1>'],
@@ -259,19 +259,19 @@ describe('buildCollections', () => {
 });
 
 // ---------------------------------------------------------------------------
-// SissiConfig.addCollection()
+// SindieConfig.addCollection()
 // ---------------------------------------------------------------------------
 
-describe('SissiConfig.addCollection', () => {
+describe('SindieConfig.addCollection', () => {
   it('registers a custom collection', () => {
-    const config = new SissiConfig();
+    const config = new SindieConfig();
     config.addCollection('featured', (api) => api.getFilteredByTag('featured'));
     assert.ok(config.collections.has('featured'));
     assert.equal(typeof config.collections.get('featured'), 'function');
   });
 
   it('supports multiple custom collections', () => {
-    const config = new SissiConfig();
+    const config = new SindieConfig();
     config.addCollection('a', (api) => api.getAllSorted());
     config.addCollection('b', (api) => api.getFilteredByTag('b'));
     assert.ok(config.collections.has('a'));
@@ -280,12 +280,12 @@ describe('SissiConfig.addCollection', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Sissi integration: collections available in templates
+// Sindie integration: collections available in templates
 // ---------------------------------------------------------------------------
 
-describe('Sissi collections integration', () => {
+describe('Sindie collections integration', () => {
   async function makeTmpSite(files) {
-    const tmpDir = await realpath(await mkdtemp(path.join(tmpdir(), 'sissi-test-')));
+    const tmpDir = await realpath(await mkdtemp(path.join(tmpdir(), 'sindie-test-')));
     for (const [name, content] of Object.entries(files)) {
       const full = path.join(tmpDir, name);
       await mkdir(path.dirname(full), { recursive: true });
@@ -303,9 +303,9 @@ describe('Sissi collections integration', () => {
 
     try {
       const outDir = path.join(tmpDir, 'public');
-      const config = new SissiConfig({ dir: { input: tmpDir, output: outDir } });
-      const sissi = new Sissi(config);
-      await sissi.build();
+      const config = new SindieConfig({ dir: { input: tmpDir, output: outDir } });
+      const sindie = new Sindie(config);
+      await sindie.build();
 
       const output = await readFile(path.join(outDir, 'index.html'), 'utf8');
       assert.equal(output.trim(), '3');
@@ -323,9 +323,9 @@ describe('Sissi collections integration', () => {
 
     try {
       const outDir = path.join(tmpDir, 'public');
-      const config = new SissiConfig({ dir: { input: tmpDir, output: outDir } });
-      const sissi = new Sissi(config);
-      await sissi.build();
+      const config = new SindieConfig({ dir: { input: tmpDir, output: outDir } });
+      const sindie = new Sindie(config);
+      await sindie.build();
 
       const output = await readFile(path.join(outDir, 'index.html'), 'utf8');
       assert.equal(output.trim(), '2');
@@ -342,10 +342,10 @@ describe('Sissi collections integration', () => {
 
     try {
       const outDir = path.join(tmpDir, 'public');
-      const config = new SissiConfig({ dir: { input: tmpDir, output: outDir } });
+      const config = new SindieConfig({ dir: { input: tmpDir, output: outDir } });
       config.addCollection('myPosts', (api) => api.getFilteredByTag('post'));
-      const sissi = new Sissi(config);
-      await sissi.build();
+      const sindie = new Sindie(config);
+      await sindie.build();
 
       const output = await readFile(path.join(outDir, 'index.html'), 'utf8');
       assert.equal(output.trim(), '1');
@@ -355,7 +355,7 @@ describe('Sissi collections integration', () => {
   });
 
   it('collections.post is sorted by date ascending', async () => {
-    const config = new SissiConfig({ dir: { input: '.', output: 'public' } });
+    const config = new SindieConfig({ dir: { input: '.', output: 'public' } });
     config.resolve = makeVFS([
       ['newer.html', withFrontmatter('<p>New</p>', { tags: ['post'], date: '2024-12-01' })],
       ['older.html', withFrontmatter('<p>Old</p>', { tags: ['post'], date: '2024-01-01' })],
@@ -451,7 +451,7 @@ describe('getNextCollectionItem', () => {
 
 describe('collection item filters: integration via template', () => {
   async function makeTmpSite(files) {
-    const tmpDir = await realpath(await mkdtemp(path.join(tmpdir(), 'sissi-test-')));
+    const tmpDir = await realpath(await mkdtemp(path.join(tmpdir(), 'sindie-test-')));
     for (const [name, content] of Object.entries(files)) {
       const full = path.join(tmpDir, name);
       await mkdir(path.dirname(full), { recursive: true });
@@ -471,9 +471,9 @@ describe('collection item filters: integration via template', () => {
 
     try {
       const outDir = path.join(tmpDir, 'public');
-      const config = new SissiConfig({ dir: { input: tmpDir, output: outDir } });
-      const sissi = new Sissi(config);
-      await sissi.build();
+      const config = new SindieConfig({ dir: { input: tmpDir, output: outDir } });
+      const sindie = new Sindie(config);
+      await sindie.build();
 
       const output = await readFile(path.join(outDir, 'post-b.html'), 'utf8');
       assert.ok(output.includes('post-a.html'));
@@ -493,9 +493,9 @@ describe('collection item filters: integration via template', () => {
 
     try {
       const outDir = path.join(tmpDir, 'public');
-      const config = new SissiConfig({ dir: { input: tmpDir, output: outDir } });
-      const sissi = new Sissi(config);
-      await sissi.build();
+      const config = new SindieConfig({ dir: { input: tmpDir, output: outDir } });
+      const sindie = new Sindie(config);
+      await sindie.build();
 
       const output = await readFile(path.join(outDir, 'post-a.html'), 'utf8');
       assert.ok(output.includes('post-b.html'));
@@ -516,9 +516,9 @@ describe('collection item filters: integration via template', () => {
 
     try {
       const outDir = path.join(tmpDir, 'public');
-      const config = new SissiConfig({ dir: { input: tmpDir, output: outDir } });
-      const sissi = new Sissi(config);
-      await sissi.build();
+      const config = new SindieConfig({ dir: { input: tmpDir, output: outDir } });
+      const sindie = new Sindie(config);
+      await sindie.build();
 
       const output = await readFile(path.join(outDir, 'post-c.html'), 'utf8');
       assert.equal(output.trim(), '2');

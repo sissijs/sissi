@@ -1,6 +1,6 @@
-# Sissi
+# Sindie
 
-Sissi 👸 stands for `Small Indieweb Static SIte` and is a configuration-free minimalistic static-site generator, inspired by [eleventy](https://11ty.dev), but for an even more minimalistic approach.
+Sindie 👸 stands for `Small Indieweb Static SIte` and is a configuration-free minimalistic static-site generator, inspired by [eleventy](https://11ty.dev), but for an even more minimalistic approach.
 
 This is a silly but serious experiment by [Lea](https://lea.lgbt/@lea) about how far we can get with dependency-free node.js. This must be how [Zach](https://zachleat.com/@zachleat) started Eleventy ☺️🎈.
 

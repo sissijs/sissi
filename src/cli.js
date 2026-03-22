@@ -2,15 +2,15 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-import { Sissi } from './sissi.js'
-import { SissiConfig } from './sissi-config.js';
+import { Sindie } from './sindie.js'
+import { SindieConfig } from './sindie-config.js';
 
 const args = new Set(process.argv);
-const config = new SissiConfig();
+const config = new SindieConfig();
 
 for (const configFile of [
-  '.sissi.js',
-  '.sissi.config.js',
+  '.sindie.js',
+  '.sindie.config.js',
 ]) {
   if (existsSync(configFile)) {
     try {
@@ -27,34 +27,34 @@ for (const configFile of [
 }
 
 function help() {
-  console.info(`Sissi - Simple Static Side Instrument 👸`);
+  console.info(`Sindie - Simple Static Side Instrument 👸`);
   console.info();
   console.info('command line args:')
-  console.info(`sissi build - build site`);
-  console.info(`sissi watch - watch mode`);
-  console.info(`sissi dev - dev server mode`);
-  console.info(`sissi version - version information`);
+  console.info(`sindie build - build site`);
+  console.info(`sindie watch - watch mode`);
+  console.info(`sindie dev - dev server mode`);
+  console.info(`sindie version - version information`);
 }
 
 async function run() {
-  const sissi = new Sissi(config);
+  const sindie = new Sindie(config);
   try {
     if (args.has('--dry')) {
-      sissi.dryMode = true;
+      sindie.dryMode = true;
     }
 
     if (args.has('watch')) {
-      await sissi.watch();
+      await sindie.watch();
       return;
     }
     
     if (args.has('dev')) {
-      await sissi.serve();
+      await sindie.serve();
       return;
     }
     
     if (args.has('build')) {
-      await sissi.build();
+      await sindie.build();
       return;
     }
     help();

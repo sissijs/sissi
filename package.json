@@ -1,20 +1,38 @@
 {
-  "name": "sissi",
-  "version": "0.0.1",
-  "description": "Sissi stands for `Simple Static Site` and is a configuration-free static-site generator for a minimalistic build step.",
+  "name": "sindie",
+  "version": "0.1.0",
+  "description": "Sindie — Small Indieweb Static Site generator. Zero external dependencies, Eleventy-inspired API.",
   "main": "index.js",
   "type": "module",
   "engines": {
-    "node": ">=24"
+    "node": ">=20"
   },
   "scripts": {
     "test": "node --test",
+    "prepublishOnly": "node --test",
     "dev": "node ./src/cli dev",
     "build": "node ./src/cli build",
     "watch": "node ./src/cli watch"
   },
-  "bin": "src/cli.js",
-  "keywords": [],
+  "bin": {
+    "sindie": "src/cli.js"
+  },
+  "files": [
+    "src/",
+    "index.js"
+  ],
+  "keywords": [
+    "static-site-generator",
+    "ssg",
+    "indieweb",
+    "zero-dependencies",
+    "eleventy"
+  ],
   "author": "Lea Rosema",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sissijs/sissi.git"
+  },
+  "homepage": "https://sindie.js.org"
 }

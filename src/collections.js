@@ -76,7 +76,7 @@ export class CollectionsAPI {
  * Extract collection items from a list of files by reading their frontmatter.
  * Does not render templates — content is always ''.
  *
- * @param {import('./sissi-config.js').SissiConfig} config
+ * @param {import('./sindie-config.js').SindieConfig} config
  * @param {object} globalData
  * @param {string[]} files  - paths relative to config.dir.input
  * @returns {Promise<object[]>}
@@ -86,7 +86,7 @@ export async function buildCollectionItems(config, globalData, files) {
   const items = [];
 
   for (const inputFile of files) {
-    // Mirror the same underscore-skip logic used in Sissi.processFile
+    // Mirror the same underscore-skip logic used in Sindie.processFile
     const parsed = path.parse(inputFile);
     if (
       inputFile.startsWith('_') ||
@@ -145,7 +145,7 @@ export async function buildCollectionItems(config, globalData, files) {
  *  - `collections.<tag>` — items tagged with that tag, sorted by date
  *  - custom collections registered via `config.addCollection()`
  *
- * @param {import('./sissi-config.js').SissiConfig} config
+ * @param {import('./sindie-config.js').SindieConfig} config
  * @param {object} globalData
  * @param {string[]} files
  * @returns {Promise<object>}

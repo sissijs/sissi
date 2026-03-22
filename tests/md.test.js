@@ -2,7 +2,7 @@ import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 
-import { SissiConfig } from '../src/sissi-config.js';
+import { SindieConfig } from '../src/sindie-config.js';
 import md from '../src/md.js';
 import html from '../src/html.js';
 
@@ -37,7 +37,7 @@ describe('md plugin', () => {
   }
   
   before(() => {
-    config = new SissiConfig();
+    config = new SindieConfig();
     config.resolve = dummyResolver;
     config.addPlugin(md);
     config.addPlugin(html);

@@ -8,7 +8,7 @@ Collections let you group pages together and iterate over them in templates — 
 
 ## How it works
 
-Before any template is rendered, Sissi scans all input files, reads their frontmatter, and assembles a `collections` object. That object is then available in every template during the build.
+Before any template is rendered, Sindie scans all input files, reads their frontmatter, and assembles a `collections` object. That object is then available in every template during the build.
 
 ---
 
@@ -31,7 +31,7 @@ Every template file is automatically added to `collections.all`, regardless of w
 
 ## Tag-based collections
 
-Add a `tags` key to any page's frontmatter and Sissi automatically creates a named collection for it:
+Add a `tags` key to any page's frontmatter and Sindie automatically creates a named collection for it:
 
 ```yaml
 ---
@@ -137,7 +137,7 @@ eleventyExcludeFromCollections:
 Register a custom collection in your config file using `addCollection`. The callback receives a `CollectionsAPI` instance and must return the value to expose as `collections.<name>`.
 
 ```js
-// .sissi.config.js
+// .sindie.config.js
 export default function(config) {
   // All posts, sorted newest first
   config.addCollection('latestPosts', (api) =>
@@ -170,7 +170,7 @@ config.addCollection('enriched', async (api) => {
 
 ## Previous and next item navigation
 
-Three functions are available in every template to navigate adjacent items in a collection. Because Sissi's pipe syntax splits on `|`, these are exposed as **callable functions** rather than pipe filters — call them directly inside `{{ }}` expressions:
+Three functions are available in every template to navigate adjacent items in a collection. Because Sindie's pipe syntax splits on `|`, these are exposed as **callable functions** rather than pipe filters — call them directly inside `{{ }}` expressions:
 
 ```html
 <!-- Link to the previous post -->
@@ -267,4 +267,4 @@ This is my second post.
 </ul>
 ```
 
-Sissi renders `collections.post` as a date-sorted array, so the oldest post appears first.
+Sindie renders `collections.post` as a date-sorted array, so the oldest post appears first.

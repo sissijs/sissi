@@ -13,7 +13,7 @@ Willy-Brandt-Straße 1<br>
 Email: lea et lea.lgbt (replace ' et ' with '@')<br>
 </address>
 
-## Person responsible for the content of `sissi.js.org`
+## Person responsible for the content of `sindie.js.org`
 
 <address>
 Lea Rosema c/o adesso SE<br>
@@ -37,6 +37,6 @@ The opinions, views, and decisions, guidelines and policies regarding software d
 
 ## Liability for contents
 
-`sissi.js.org` is responsible for its own content on these pages in accordance with general legislation pursuant to Section 7 (1) of the German Telemedia Act (TMG). According to §§ 8 to 10 TMG, however, there is no obligation to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity.
+`sindie.js.org` is responsible for its own content on these pages in accordance with general legislation pursuant to Section 7 (1) of the German Telemedia Act (TMG). According to §§ 8 to 10 TMG, however, there is no obligation to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity.
 
 Obligations to remove or block the use of information under the general laws remain unaffected. However, liability in this regard is only possible from the point in time at which a concrete infringement of the law becomes known. If lea.lgbt becomes aware of any such infringements, this content will be removed immediately.

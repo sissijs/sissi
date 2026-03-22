@@ -1,14 +1,14 @@
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { readDataDir } from '../src/data.js';
-import { SissiConfig } from '../src/sissi-config.js';
+import { SindieConfig } from '../src/sindie-config.js';
 
 
 describe('readDataDir', () => {
   let config;
   
   before(() => {
-    config = new SissiConfig({dir: {
+    config = new SindieConfig({dir: {
       input: 'tests/fixtures/data',
       data: '_data',
       output: 'dist'

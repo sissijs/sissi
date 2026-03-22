@@ -1,10 +1,10 @@
 ---
-title: Welcome to Sissi
+title: Welcome to Sindie
 layout: base.html
 ---
 # {{ title }}
 
-Sissi 👸 stands for `Small Indieweb Static SIte` and is a configuration-free minimalistic static-site generator, inspired by [eleventy](https://11ty.dev), but for an even more minimalistic approach.
+Sindie 👸 stands for `Small Indieweb Static SIte` and is a configuration-free minimalistic static-site generator, inspired by [eleventy](https://11ty.dev), but for an even more minimalistic approach.
 
 It has zero node-modules dependencies.
 

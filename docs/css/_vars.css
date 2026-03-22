@@ -1,14 +1,14 @@
 :root {
-  --bg: #222;
+  --bg: #2f272d;
   --fg: white;
-  --anchor: #7fd;
-  --header-bg: #323c39;
+  --anchor: #2fc;
+  --header-bg: #3f373d;
   --header-fg: #fff;
-  --header-anchor-fg: #7fd;
+  --header-anchor-fg: #b8c4cc;
 
   --footer-bg: #000;
   --footer-fg: #fff;
-  --footer-anchor-fg: #7fd;
+  --footer-anchor-fg: #b8c4cc;
 }
 
 @media screen and (prefers-color-scheme: light) {

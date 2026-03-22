@@ -1,13 +1,13 @@
 import path from 'node:path';
 import { readdir, readFile } from 'node:fs/promises';
 
-import { SissiConfig } from "./sissi-config.js";
+import { SindieConfig } from "./sindie-config.js";
 import { smolYAML } from './transforms/smolyaml.js';
 
 /**
  * read contents of the data dir into an object
  * 
- * @param {SissiConfig} config 
+ * @param {SindieConfig} config 
  */
 export async function readDataDir(config) {
   const relativeDataDir = path.normalize(path.join(config.dir.input || '.', config.dir.data || '_data'));
