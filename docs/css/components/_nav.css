@@ -2,7 +2,7 @@
   display: flex;
   gap: 1rem;
   padding-block: 2rem;
-  padding-inline: 1rem;
+  padding-inline: 2rem;
   a {
     font-size: 1.2em;
     font-weight: bold;

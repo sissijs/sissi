@@ -4,7 +4,7 @@ layout: base.html
 ---
 # {{ title }}
 
-Sissi is a zero-external-dependency static site generator built on Node.js stdlib only. This page documents how it works under the hood — useful if you want to contribute, write a plugin, or just understand what happens when you run `npm run build`.
+Sindie is a zero-external-dependency static site generator built on Node.js stdlib only. This page documents how it works under the hood — useful if you want to contribute, write a plugin, or just understand what happens when you run `npm run build`.
 
 ## High-level pipeline
 
@@ -19,7 +19,7 @@ For each file:
 
 **Collections pass (once per build):**
 
-Sissi scans all input files, reads their frontmatter, and assembles the `collections` object before any template is rendered. This means every template has access to the full site's collection data.
+Sindie scans all input files, reads their frontmatter, and assembles the `collections` object before any template is rendered. This means every template has access to the full site's collection data.
 
 **Per-file pipeline:**
 
@@ -39,8 +39,8 @@ The orchestrator for the per-file pipeline is `src/transforms/template-data.js` 
 ```txt
 src/
 ├── cli.js                     Entry point — loads config, runs build/watch/serve
-├── sissi.js                   Sissi class — build(), watch(), serve()
-├── sissi-config.js            SissiConfig — plugins, filters, collections, directory config
+├── Sindie.js                   Sindie class — build(), watch(), serve()
+├── Sindie-config.js            SindieConfig — plugins, filters, collections, directory config
 ├── collections.js             CollectionsAPI + buildCollections() (two-pass build)
 ├── resolver.js                Read local files or fetch remote URLs
 ├── data.js                    Load global data from _data/ directory
@@ -65,7 +65,7 @@ src/
 
 ## Template engine
 
-Sissi ships a custom Handlebars-like template engine (no external library). Expressions are delimited by `{{ }}`.
+Sindie ships a custom Handlebars-like template engine (no external library). Expressions are delimited by `{{ }}`.
 
 **Variable output:**
 
@@ -106,7 +106,7 @@ Template expressions are evaluated inside a Node.js `vm` sandbox, so they have a
 | `getNextCollectionItem` | Next item in a collection relative to the current page |
 | `getCollectionItemIndex` | Zero-based index of the current page in a collection |
 
-The three collection-item helpers are also injected into the template context as **callable functions**, since Sissi's pipe syntax splits on `|` which prevents chaining property access after a piped result. Use them as `{{ getPreviousCollectionItem(collections.post, page)?.page?.url }}`.
+The three collection-item helpers are also injected into the template context as **callable functions**, since Sindie's pipe syntax splits on `|` which prevents chaining property access after a piped result. Use them as `{{ getPreviousCollectionItem(collections.post, page)?.page?.url }}`.
 
 Custom filters are registered via `config.addFilter(name, fn)` in your config file.
 
@@ -114,7 +114,7 @@ Custom filters are registered via `config.addFilter(name, fn)` in your config fi
 
 ## Plugin system
 
-Plugins teach Sissi how to process a new file type. Each plugin is a function that receives the `SissiConfig` instance and registers one or more extensions:
+Plugins teach Sindie how to process a new file type. Each plugin is a function that receives the `SindieConfig` instance and registers one or more extensions:
 
 ```js
 export default function myPlugin(config) {
@@ -176,10 +176,10 @@ Each file becomes a key on the global data object (e.g. `_data/meta.js` → `{{ 
 
 ## Watch mode and dependency tracking
 
-In watch mode (`npm run watch` / `npm run dev`), Sissi builds a dependency graph before starting:
+In watch mode (`npm run watch` / `npm run dev`), Sindie builds a dependency graph before starting:
 
 - `src/dependency-graph.js` scans all source files and records which files are referenced by which others (by checking whether a file's basename appears inside each other file's content).
-- When a file changes, Sissi rebuilds that file **plus all files that depend on it**, rather than rebuilding everything.
+- When a file changes, Sindie rebuilds that file **plus all files that depend on it**, rather than rebuilding everything.
 
 Debounce is configurable via `config.watchFileDelta` (default: 1000 ms).
 
@@ -227,7 +227,7 @@ The `CollectionsAPI` class (also exported from `collections.js`) is passed to `a
 
 ## Configuration reference
 
-The config file (`.sissi.config.js` or `.sissi.js`) exports a function:
+The config file (`.Sindie.config.js` or `.Sindie.js`) exports a function:
 
 ```js
 export default function(config) {
@@ -280,7 +280,7 @@ export default function(config) {
 
 ## Zero-dependency philosophy
 
-Sissi relies exclusively on Node.js built-in modules:
+Sindie relies exclusively on Node.js built-in modules:
 
 | Feature | Node.js stdlib used |
 |---|---|

@@ -32,7 +32,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sissijs/sissi.git"
+    "url": "git+https://github.com/sindiejs/sindie.git"
   },
   "homepage": "https://sindie.js.org"
 }

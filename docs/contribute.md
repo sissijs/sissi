@@ -5,7 +5,7 @@ layout: base.html
 # Contribute
 
 Thank you for your interest in contribution. This is very much appreciated.
-All the code is in the [github repo](https://github.com/sissijs/sindie/).
+All the code is in the [github repo](https://github.com/Sindiejs/sindie/).
 
 There are several ways you can contribute:
 

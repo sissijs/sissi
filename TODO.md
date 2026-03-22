@@ -4,7 +4,7 @@ Three pages are significantly incomplete. Here's the plan:
 
 ## configuration.md — near-empty stub
 
-- [x] Document both valid config file names (`.sissi.js` and `.sissi.config.js`)
+- [x] Document both valid config file names (`.Sindie.js` and `.Sindie.config.js`)
 - [x] Document the `dir` object with all keys and their defaults (`input`, `output`, `includes`, `layouts`, `data`)
 - [x] Document all config API methods with examples:
   - `config.addPlugin(fn)`
@@ -19,7 +19,7 @@ Three pages are significantly incomplete. Here's the plan:
 
 ## data.md — empty-section outline
 
-- [x] Explain the data cascade and merge order (Sissi data → `_data/` files → frontmatter)
+- [x] Explain the data cascade and merge order (Sindie data → `_data/` files → frontmatter)
 - [x] Document `_data/` directory: `.js` (default export), `.json`, `.yaml` files
 - [x] Document frontmatter: default YAML format and JSON format (`---json`)
 - [x] Document the `page` object and all its fields (`url`, `fileSlug`, `filePathStem`, `inputPath`, `outputPath`, `outputFileExtension`, `date`)

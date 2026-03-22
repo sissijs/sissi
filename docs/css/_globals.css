@@ -92,3 +92,6 @@ pre {
   border-radius: 0;
 }
 
+ul, ol {
+  list-style-position: inside;
+}

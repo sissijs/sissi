@@ -1,5 +1,5 @@
 ---
-title: Welcome to Sissi
+title: Welcome to Sindie
 layout: base.html
 ---
 # {{ title }}
