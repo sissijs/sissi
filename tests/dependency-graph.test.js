@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { getDependencyMap, walkDependencyMap } from '../src/dependency-graph.js';
+import { getDependencyMap, updateDependencyMap, walkDependencyMap } from '../src/dependency-graph.js';
 
 describe('Dependency Map', () => {
 
@@ -101,6 +101,41 @@ describe('Dependency Map', () => {
     });
   });
 
+
+  describe('updateDependencyMap', () => {
+    it('should add new include relationships when a file gains a dependency', async () => {
+      const files = {
+        'index.html': '<html-include src="top.html">',
+        '_includes/top.html': '<header></header>',
+      };
+      const resolve = setupVFS(files);
+      const deps = await getDependencyMap('', Object.keys(files), resolve);
+
+      // index.html is updated to also include nav.html
+      files['index.html'] = '<html-include src="top.html"><html-include src="nav.html">';
+      files['_includes/nav.html'] = '<nav></nav>';
+      const allFiles = Object.keys(files);
+      await updateDependencyMap(deps, '', allFiles, 'index.html', setupVFS(files));
+
+      assert.deepEqual(deps['_includes/top.html'], ['index.html']);
+      assert.deepEqual(deps['_includes/nav.html'], ['index.html']);
+    });
+
+    it('should remove stale include relationships when a file drops a dependency', async () => {
+      const files = {
+        'index.html': '<html-include src="top.html">',
+        '_includes/top.html': '<header></header>',
+      };
+      const resolve = setupVFS(files);
+      const deps = await getDependencyMap('', Object.keys(files), resolve);
+
+      // index.html is updated to no longer include top.html
+      files['index.html'] = '<p>no includes</p>';
+      await updateDependencyMap(deps, '', Object.keys(files), 'index.html', setupVFS(files));
+
+      assert.equal(deps['_includes/top.html'], undefined);
+    });
+  });
 
   describe('walkDependencyMap', () => {
 

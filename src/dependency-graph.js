@@ -30,6 +30,37 @@ export async function getDependencyMap(inputRootDir, inputFilePaths, resolver) {
 }
 
 /**
+ * Incrementally update the dependency map after a single file changes.
+ * Removes stale entries for the changed file, then re-scans only that file.
+ *
+ * @param {Record<string, string[]>} deps - The map to update in-place.
+ * @param {string} inputRootDir
+ * @param {string[]} inputFilePaths - Current full file list (from readdir).
+ * @param {string} changedFile - The file that changed (relative to inputRootDir).
+ * @param {Function} [resolver]
+ */
+export async function updateDependencyMap(deps, inputRootDir, inputFilePaths, changedFile, resolver) {
+  // Remove changedFile from all dependant lists
+  for (const key of Object.keys(deps)) {
+    deps[key] = deps[key].filter(f => f !== changedFile);
+    if (deps[key].length === 0) delete deps[key];
+  }
+  // Re-scan the changed file if it's a trackable type
+  if (/\.(md|css|html?)$/.test(changedFile)) {
+    const content = await (resolver ?? resolve)(path.normalize(path.join(inputRootDir, changedFile)));
+    if (typeof content === 'string') {
+      for (const dependency of inputFilePaths) {
+        const baseName = path.parse(dependency).base;
+        if (content.includes(baseName)) {
+          if (!deps.hasOwnProperty(dependency)) deps[dependency] = [];
+          deps[dependency].push(changedFile);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Recursively walk through the dependency map for a specific file
  * @param {*} map the dependency map
  * @param {*} file the file in question

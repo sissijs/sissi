@@ -7,7 +7,7 @@ import { serve } from './httpd.js';
 import EventEmitter from 'node:events';
 import { readDataDir } from './data.js';
 import { handleTemplateFile } from './transforms/template-data.js';
-import { getDependencyMap, walkDependencyMap } from './dependency-graph.js';
+import { getDependencyMap, updateDependencyMap, walkDependencyMap } from './dependency-graph.js';
 import { resolve } from './resolver.js';
 
 export class Sissi {
@@ -88,6 +88,8 @@ export class Sissi {
       throw new Error(`Input directory Not found: ${this.config.dir.input}`);
     }
     console.info(`[watch]\tSissi is watching ${this.config.dir.input}`);
+    let allFiles = await readdir(inputDir, { recursive: true });
+    const deps = await getDependencyMap(inputDir, allFiles, this.config.resolve || resolve);
     try {
       const watcher = watch(this.config.dir.input, options);
       for await (const event of watcher) {
@@ -109,11 +111,8 @@ export class Sissi {
           await this.build(null, eventEmitter);
           continue;
         }
-        const deps = await getDependencyMap(
-          this.config.dir.input,
-          await readdir(path.normalize(this.config.dir.input), {recursive: true}),
-          this.config.resolve || resolve
-        );
+        allFiles = await readdir(inputDir, { recursive: true });
+        await updateDependencyMap(deps, inputDir, allFiles, event.filename, this.config.resolve || resolve);
         const allDependants = walkDependencyMap(deps, event.filename);
         await this.build([event.filename, ...allDependants], eventEmitter);
       }
